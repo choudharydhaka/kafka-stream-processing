@@ -1,0 +1,15 @@
+rss:
+  url: https://www.upwork.com/ab/feed/topics/rss?securityToken=0561af26a8ae31e0583280eee4f9187a491b9ae692ba582360fa6f7eb3649a941e7ebeb36615900e52b5d04efe88883f89b0464a95d7543f14d5ea0b2592873b&userUid=1086524631491592192&orgUid=1086524631499980801&topic=4939097
+ 
+ 
+kafka:
+  server: localhost
+  port: "9092"
+  topic:
+    write: rss-feed-input
+    read: rss-feed-output
+
+local:
+  host: localhost
+  port: "8080"
+  basepath: api    

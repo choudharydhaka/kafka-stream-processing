@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:tls="http://www.mulesoft.org/schema/mule/tls" xmlns:apikit="http://www.mulesoft.org/schema/mule/mule-apikit"
+	xmlns:kafka="http://www.mulesoft.org/schema/mule/kafka"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/kafka http://www.mulesoft.org/schema/mule/kafka/current/mule-kafka.xsd
+http://www.mulesoft.org/schema/mule/mule-apikit http://www.mulesoft.org/schema/mule/mule-apikit/current/mule-apikit.xsd
+http://www.mulesoft.org/schema/mule/tls http://www.mulesoft.org/schema/mule/tls/current/mule-tls.xsd">
+	    
+	<!--  <kafka:producer-config name="TLS_Apache_Kafka_Producer_configuration" doc:name="Apache Kafka Producer configuration" doc:id="53076e21-4abe-43e8-bdfd-de7ac9603858" topic="DHAKS-TOPIC">
+		<kafka:producer-plaintext-connection tlsContext="TLS_Context" endpointIdentificationAlgorithm="disabled">
+			<kafka:bootstrap-servers >
+				<kafka:bootstrap-server value="localhost:9093" />
+			</kafka:bootstrap-servers>
+		</kafka:producer-plaintext-connection>
+	</kafka:producer-config>  -->
+	<!-- <kafka:producer-config name="Apache_Kafka_Producer_configuration" doc:name="Apache Kafka Producer configuration" doc:id="22889928-cde7-499c-8577-8935ffabf849" topic="t1p1">
+		<kafka:producer-plaintext-connection   endpointIdentificationAlgorithm="disabled">
+			<kafka:bootstrap-servers >
+				<kafka:bootstrap-server value="localhost:9092" />
+			</kafka:bootstrap-servers>
+		</kafka:producer-plaintext-connection>
+	</kafka:producer-config> 
+	<http:listener-config name="kafkaEventProducer-httpListenerConfig">
+        <http:listener-connection host="localhost" port="8081"  />
+    </http:listener-config>
+    <apikit:config name="kafkaEventProducer-config" api="kafkaEventProducer.raml" outboundHeadersMapName="outboundHeaders" httpStatusVarName="httpStatus" />
+	<tls:context name="TLS_Context" doc:name="TLS Context" doc:id="fe7ad56d-be42-4e0f-a094-2cf196fd70f8" >
+		<tls:trust-store path="kafka.broker.truststore.jks" password="changeit" type="jks" insecure="true"/>
+		<tls:key-store type="jks" path="kafka.broker.keystore.jks" alias="localhost" keyPassword="password" password="changeit" />
+	</tls:context> -->
+   <http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="57cd3437-136a-40a5-befc-95846e44f110" basePath="${local.basepath}" >
+		<http:listener-connection host="${local.host}" port="${local.port}" />
+	</http:listener-config>
+   
+    <kafka:producer-config name="Apache_Kafka_Producer_configuration" doc:name="Apache Kafka Producer configuration" doc:id="f2ef6ee9-1b7f-47d5-a726-8764bbc16533" >
+		<kafka:producer-plaintext-connection >
+		 
+			<kafka:bootstrap-servers >
+				<kafka:bootstrap-server value="${kafka.server}:${kafka.port}" />
+			</kafka:bootstrap-servers>
+		</kafka:producer-plaintext-connection>
+	</kafka:producer-config>
+		
+	<kafka:consumer-config name="Apache_Kafka_Consumer_configuration" doc:name="Apache Kafka Consumer configuration" doc:id="07514069-be11-48bd-8016-c8218cf980d3" >
+		<kafka:consumer-plaintext-connection autoOffsetReset="EARLIEST">
+			<kafka:bootstrap-servers >
+				<kafka:bootstrap-server value="${kafka.server}:${kafka.port}" />
+			</kafka:bootstrap-servers>
+			<kafka:topic-patterns >
+		 
+ 			 <kafka:topic-pattern value="${kafka.topic.read}" /> 
+			</kafka:topic-patterns>
+		</kafka:consumer-plaintext-connection>
+	</kafka:consumer-config>
+	<configuration-properties doc:name="Configuration properties" doc:id="a90b223f-afeb-43dc-aa43-33deaa26b978" file="app.yaml" />
+	 </mule>

@@ -1,0 +1,29 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<types:mule xmlns:types="http://www.mulesoft.org/schema/mule/types">
+  <types:catalog>
+    <types:type name="rss" format="xml">
+      <types:example format="xml" element="rss" location="examples/rss_response.xml"/>
+    </types:type>
+    <types:type name="kafka_topic" format="json">
+      <types:shape format="weave" example="examples/kafka_producer.json"><![CDATA[%dw 2.0
+
+type kafka_topic = Array<{|  guid: String,   link: String,   description: String,   pubDate: String,   title: String|}> {"example": "[{\\\"guid\\\":\\\"https:\\/\\/www.upwork.com\\/jobs\\/Integration-Expert_%7E01b94eab3164cd1000?source=rss\\\",\\\"link\\\":\\\"https:\\/\\/www.upwork.com\\/jobs\\/Integration-Expert_%7E01b94eab3164cd1000?source=rss\\\",\\\"description\\\":\\\"All Java EE Any jobs | upwork.com\\\",\\\"pubDate\\\":\\\"Mon, 12 Apr 2021 21:30:28 +0000\\\",\\\"title\\\":\\\"All Java EE Any jobs | upwork.com\\\"}]"}
+
+]]></types:shape>
+    </types:type>
+  </types:catalog>
+  <types:enrichment select="#e89d1d4c-0f74-46da-8f2b-6d5c780a2588">
+    <types:processor-declaration>
+      <types:input-event>
+        <types:message>
+          <types:payload type="rss"/>
+        </types:message>
+      </types:input-event>
+      <types:output-event>
+        <types:message>
+          <types:payload type="kafka_topic"/>
+        </types:message>
+      </types:output-event>
+    </types:processor-declaration>
+  </types:enrichment>
+</types:mule>

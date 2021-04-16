@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:kafka="http://www.mulesoft.org/schema/mule/kafka" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/kafka http://www.mulesoft.org/schema/mule/kafka/current/mule-kafka.xsd">
+	
+
+	<flow name="rss-readerFlow" doc:id="4e0a1d69-0404-4f5b-8f13-7c1a42b94077" >
+		<scheduler doc:name="Run Every 10 Sec" doc:id="b6d62b9b-bbb4-4ea7-853b-0b12524a9266" >
+			<scheduling-strategy >
+				<fixed-frequency frequency="10000"/>
+			</scheduling-strategy>
+		</scheduler>
+		<http:request method="GET" doc:name="Request to ${rss.url}" doc:id="8df3833d-b449-4bef-9a4c-b5ba9b6a689f" url="${rss.url}"/>
+		<logger level="INFO" doc:name="Logger" doc:id="7d9be825-0e7d-4d48-9f12-b2caddf9ec62" message="Response received successfully"/>
+		<ee:transform doc:name="Transform Message" doc:id="e89d1d4c-0f74-46da-8f2b-6d5c780a2588">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+payload.rss.channel.*item map ( item , indexOfItem ) -> {
+	guid: item.guid default "",
+	link: item.link default "",
+	description: item.description default "",
+	pubDate: item.pubDate default "",
+	title: item.title default ""
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<foreach doc:name="For Each" doc:id="de7027ef-41f1-4ffa-ade4-5e65dd130edf" collection="payload">
+			<kafka:publish doc:name="Publish" doc:id="8a6f97fc-1389-43eb-81eb-c0bfce6c17e8" config-ref="Apache_Kafka_Producer_configuration" topic="${kafka.topic.write}"/>
+		</foreach>
+		<logger level="INFO" doc:name="Success" doc:id="36dbcadb-e8fa-4c64-9607-dca4165fd194" message="Records sent to Kafka Cluster successfully" />
+	</flow>
+	<flow name="Read-Kafka-Message" doc:id="db47fd7f-58e8-46b1-a040-28896da3849f" >
+		<http:listener doc:name="/kafka-message" doc:id="471a37ce-abde-4f53-9150-061b2b9983a2" config-ref="HTTP_Listener_config" path="/kafka-message"/>
+		<logger level="INFO" doc:name="Logger" doc:id="4e3d91c4-3642-429e-9b1d-f31a740311d9" message="Request Received, READING FROM ${kafka.topic.read}"/>
+		<kafka:consume doc:name="Consume" doc:id="dbf46b7f-4104-42c8-94c9-7b93b055fff1" config-ref="Apache_Kafka_Consumer_configuration"/>
+		<ee:transform doc:name="Transform Message" doc:id="8dfc3446-9622-4595-812e-985c093efc87" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+</mule>

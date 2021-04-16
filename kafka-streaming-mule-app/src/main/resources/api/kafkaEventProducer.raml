@@ -1,0 +1,26 @@
+#%RAML 1.0
+title: Kafka Event Producer
+version: v1
+
+/events:
+  post:
+    body:
+      application/json:
+        properties:
+          message: 
+            type: string
+            example: "This is my message for Kafka broker!"
+          topicName:
+            type: string
+            example: "topic1"
+          partitionNumber?:
+            type: integer
+            example: 1            
+    responses:
+      200:
+        body:
+          application/json:
+            properties:
+              status:
+                type: string
+                example: "Message created successfully!"      
